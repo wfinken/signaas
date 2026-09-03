@@ -14,3 +14,6 @@ export function canonicalOrigin(publicOrigin: string | undefined): string {
   const value = (publicOrigin ?? DEFAULT_PUBLIC_ORIGIN).trim();
   return value.replace(/\/+$/, "") || DEFAULT_PUBLIC_ORIGIN;
 }
+
+/** Where the corpus lives, and where a new tone or sign-off is a pull request away. */
+export const REPOSITORY_URL = "https://github.com/wfinken/signaas";

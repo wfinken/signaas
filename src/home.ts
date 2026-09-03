@@ -1,4 +1,5 @@
 import { CATEGORIES } from "./categories";
+import { REPOSITORY_URL } from "./config";
 import { buildSignature, toText } from "./signature";
 
 /** Safe to embed inside a <script> tag: no closing tag can escape the string. */
@@ -362,6 +363,24 @@ td code { color: var(--accent); font-weight: 500; }
   font-size: 14.5px; color: var(--ink-soft);
 }
 
+/* ------------------------------------------------------------- contribute */
+.steps {
+  margin-top: 32px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+}
+.steps div { padding: 22px 26px; border-left: 1px solid var(--line-soft); }
+.steps div:first-child { border-left: 0; }
+.steps b {
+  display: block; font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  color: var(--accent); margin-bottom: 8px;
+}
+.steps p { color: var(--ink-soft); font-size: 15px; }
+.cta { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
+.cta .btn { display: inline-block; margin-left: 0; text-decoration: none; padding: 10px 20px; font-size: 15px; }
+.cta .more { font-size: 15px; }
+
 footer {
   padding: 40px 60px 72px; display: flex; flex-wrap: wrap; gap: 10px 26px;
   color: var(--muted); font-size: 14px;
@@ -396,6 +415,9 @@ footer {
   .facts { grid-template-columns: repeat(2, 1fr); }
   .facts div:nth-child(odd) { border-left: 0; }
   .facts div:nth-child(n + 3) { border-top: 1px solid var(--line-soft); }
+  .steps { grid-template-columns: 1fr; }
+  .steps div { border-left: 0; border-top: 1px solid var(--line-soft); }
+  .steps div:first-child { border-top: 0; }
   .cells { grid-template-columns: 1fr; }
   .cell { border-left: 0; border-top: 1px solid var(--line-soft); }
   .cell:first-child { border-top: 0; }
@@ -640,6 +662,24 @@ function fillerCells(): string {
   return fill(3, "filler") + fill(2, "filler-narrow");
 }
 
+/**
+ * The pirate file, as it sits in the repository, rebuilt from the corpus so the
+ * sample on the page can never drift from the real format.
+ */
+function sampleFile(): string {
+  const category = CATEGORIES.find((entry) => entry.slug === "pirate") ?? CATEGORIES[0]!;
+  const signers = new Set(category.templates.map((template) => template.signer ?? "{name}"));
+  const shared = signers.size === 1 ? [...signers][0]! : "{name}";
+  const header = [category.name, `description: ${category.description}`];
+  if (category.aliases.length) header.push(`aliases: ${category.aliases.join(", ")}`);
+  if (shared !== "{name}") header.push(`signer: ${shared}`);
+  const lines = category.templates.slice(0, 3).map((template) => {
+    const signer = template.signer ?? "{name}";
+    return signer === shared ? template.message : `${template.message} | ${signer}`;
+  });
+  return [...header, "", ...lines, "Your line goes here,"].join("\n");
+}
+
 function aliasRows(): string {
   return CATEGORY_SUMMARY.map(
     (category) => `
@@ -695,6 +735,7 @@ export function renderHomepage(origin: string, canonical: string): string {
       <a href="#api"><i>01</i>API</a>
       <a href="#categories"><i>02</i>Tones</a>
       <a href="#limits"><i>03</i>Limits</a>
+      <a href="#contribute"><i>04</i>Contribute</a>
     </nav>
     <div class="rail-foot">
       Cloudflare Workers<br/>
@@ -883,8 +924,45 @@ $ curl -H 'Accept: text/html' '${origin}/business/John?title=VP%20of%20Sales'
       </div>
     </section>
 
+    <section id="contribute">
+      <div class="sect-head">
+        <span class="label">04 — Contribute</span>
+        <h2>Have a better sign-off? Add it.</h2>
+        <p class="lede">
+          Every tone is a plain text file in the repository. The file name is the
+          URL, the first line is the name, and everything under the blank line is
+          one sign-off per line. Adding a line — or a whole new tone — is a text
+          edit you can make in the browser. No code, no build step.
+        </p>
+      </div>
+
+      <span class="label block-label">categories/pirate.txt</span>
+      <div class="block"><pre>${sampleFile()}</pre></div>
+
+      <div class="steps">
+        <div>
+          <b>01</b>
+          <p>Open a tone in <code>categories/</code> on GitHub, or create a new file there.</p>
+        </div>
+        <div>
+          <b>02</b>
+          <p>Add your line at the bottom. Keep it something you would be glad to receive.</p>
+        </div>
+        <div>
+          <b>03</b>
+          <p>Open a pull request. The checks read your file and say exactly what, if anything, needs fixing.</p>
+        </div>
+      </div>
+
+      <div class="cta">
+        <a class="btn go" href="${REPOSITORY_URL}">Contribute on GitHub</a>
+        <a class="more" href="${REPOSITORY_URL}/blob/main/CONTRIBUTING.md">Read the two-minute guide</a>
+      </div>
+    </section>
+
     <footer>
       <a href="${canonical}/">${host}</a>
+      <a href="${REPOSITORY_URL}">GitHub</a>
       <span>Signature as a Service</span>
       <span>Cloudflare Workers</span>
       <span>MIT licensed</span>

@@ -102,6 +102,26 @@ $ npx wrangler secret put API_KEYS
 
 Adjust the allowance with the `RATE_LIMIT` var in `wrangler.jsonc`.
 
+## Signatures served
+
+The homepage hero carries a running tally — *12,345 signatures served* — and
+`GET /health` reports the same number as `served`. Every successful signature
+response adds one; documentation, catalogue and health requests do not count.
+
+The tally lives in a D1 database and is **off until one is bound**, so a first
+deploy works with no setup: the API serves every request, the homepage leaves
+the line out, and `/health` reports `"served": null`. To turn it on:
+
+```console
+$ npx wrangler d1 create signaas
+```
+
+then uncomment the `d1_databases` block in `wrangler.jsonc` and paste the id.
+The Worker creates its one table on first use, so there is no migration to
+run; `migrations/0001_counters.sql` holds the same schema for anyone who would
+rather apply it explicitly. The increment runs after each response has left,
+and a failure to count is logged and never surfaces to a caller.
+
 ## Security
 
 `:name` and every query parameter are normalised, stripped of control,

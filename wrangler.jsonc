@@ -39,4 +39,18 @@
   // Paid-tier keys bypass the limit. Set them as a secret (comma separated):
   //
   //   npx wrangler secret put API_KEYS
+
+  // The "signatures served" tally on the homepage is backed by D1, and is off
+  // until a database is bound as DB. Without it the API serves every request
+  // and the homepage simply leaves the line out. To enable:
+  //
+  //   npx wrangler d1 create signaas
+  //
+  // then uncomment and paste the returned id. The counters table is created
+  // on first use, so no migration step is needed; migrations/ holds the same
+  // schema for anyone who prefers to apply it explicitly.
+  //
+  // "d1_databases": [
+  //   { "binding": "DB", "database_name": "signaas", "database_id": "<paste-id-here>" }
+  // ]
 }

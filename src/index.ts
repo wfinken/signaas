@@ -1,5 +1,6 @@
 import { CATEGORIES, findCategory, normalizeSlug } from "./categories";
 import { canonicalOrigin } from "./config";
+import { countSignature, signaturesServed } from "./counter";
 import type { Env } from "./env";
 import { CONTENT_TYPES, negotiateFormat, type Format } from "./negotiate";
 import { renderHomepage } from "./home";
@@ -158,7 +159,7 @@ function segments(pathname: string): string[] {
     });
 }
 
-async function handle(request: Request, env: Env): Promise<Response> {
+async function handle(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const url = new URL(request.url);
   const origin = url.origin;
   const canonical = canonicalOrigin(env.PUBLIC_ORIGIN);
@@ -176,7 +177,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
   if (path.length === 0) {
     if (format === "html") {
-      return respond(renderHomepage(origin, canonical), {
+      return respond(renderHomepage(origin, canonical, await signaturesServed(env.DB)), {
         format: "html",
         cache: "public, max-age=300",
       });
@@ -196,7 +197,11 @@ async function handle(request: Request, env: Env): Promise<Response> {
   if (path.length === 1) {
     switch (first) {
       case "health":
-        return json({ status: "ok", categories: CATEGORIES.length });
+        return json({
+          status: "ok",
+          categories: CATEGORIES.length,
+          served: await signaturesServed(env.DB),
+        });
       case "categories":
         return json(categoryCatalogue(origin), { cache: "public, max-age=3600" });
       case "openapi.json":
@@ -223,7 +228,10 @@ async function handle(request: Request, env: Env): Promise<Response> {
     const limit = await checkRateLimit(request, env);
     const headers = rateLimitHeaders(limit);
     if (!limit.allowed) return tooManyRequests(limit, format, headers);
-    return renderSignature(first!, second!, url, format, headers);
+    const response = renderSignature(first!, second!, url, format, headers);
+    // Count it after the response is on its way; the tally never delays a signature.
+    if (response.ok && env.DB) ctx.waitUntil(countSignature(env.DB));
+    return response;
   }
 
   return fail(404, "not_found", "Nothing here. Try " + origin + "/funny/Ada", format, {
@@ -248,9 +256,9 @@ function tooManyRequests(
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
-      const response = await handle(request, env);
+      const response = await handle(request, env, ctx);
       // HEAD must not carry a body, but should keep the headers of the GET.
       return request.method === "HEAD" ? new Response(null, response) : response;
     } catch (error) {

@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "signaas",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-02-04",
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    // Free-tier allowance, per IP, per rolling hour window.
+    "RATE_LIMIT": "100"
+  }
+
+  // Rate limiting is enabled automatically once a KV namespace is bound as
+  // RATE_LIMIT_KV. Without the binding the API still serves every request,
+  // it just does not count them. To enable:
+  //
+  //   npx wrangler kv namespace create RATE_LIMIT_KV
+  //
+  // then uncomment and paste the returned id:
+  //
+  // "kv_namespaces": [
+  //   { "binding": "RATE_LIMIT_KV", "id": "<paste-id-here>" }
+  // ]
+  //
+  // Paid-tier keys bypass the limit. Set them as a secret (comma separated):
+  //
+  //   npx wrangler secret put API_KEYS
+  //
+  // Once signaas.io is on this Cloudflare account, add:
+  //
+  // "routes": [
+  //   { "pattern": "signaas.io", "custom_domain": true }
+  // ]
+}

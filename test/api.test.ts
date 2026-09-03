@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATEGORIES } from "../src/categories";
+import { CATEGORIES, findCategory, normalizeSlug } from "../src/categories";
 import { get, memoryKv } from "./helpers";
 
 describe("signature endpoint", () => {
@@ -102,6 +102,40 @@ describe("signature endpoint", () => {
   });
 });
 
+describe("the corpus", () => {
+  it("holds 28 tones and 485 templates", () => {
+    const templates = CATEGORIES.reduce((total, category) => total + category.templates.length, 0);
+    expect(CATEGORIES).toHaveLength(28);
+    expect(templates).toBe(485);
+  });
+
+  it("gives every tone a lookup key nothing else claims", () => {
+    const keys = CATEGORIES.flatMap((category) => [category.slug, ...category.aliases]).map(
+      (key) => normalizeSlug(key),
+    );
+    expect(new Set(keys).size).toBe(keys.length);
+    for (const category of CATEGORIES) {
+      expect(findCategory(category.slug)).toBe(category);
+      for (const alias of category.aliases) expect(findCategory(alias)).toBe(category);
+    }
+  });
+
+  it("never repeats a sign-off, in any tone", () => {
+    const messages = CATEGORIES.flatMap((category) =>
+      category.templates.map((template) => template.message),
+    );
+    expect(new Set(messages).size).toBe(messages.length);
+  });
+
+  it("writes every haiku as three slash-separated lines", () => {
+    const haiku = findCategory("haiku");
+    expect(haiku).toBeDefined();
+    for (const template of haiku!.templates) {
+      expect(template.message.split(" / ")).toHaveLength(3);
+    }
+  });
+});
+
 describe("service endpoints", () => {
   it("serves the homepage to browsers", async () => {
     const response = await get("/", { headers: { accept: "text/html,application/xhtml+xml" } });
@@ -140,8 +174,8 @@ describe("service endpoints", () => {
   it("lists categories", async () => {
     const response = await get("/categories");
     const body = (await response.json()) as { count: number; categories: unknown[] };
-    expect(body.count).toBe(14);
-    expect(body.categories).toHaveLength(14);
+    expect(body.count).toBe(CATEGORIES.length);
+    expect(body.categories).toHaveLength(CATEGORIES.length);
   });
 
   it("describes itself with OpenAPI", async () => {

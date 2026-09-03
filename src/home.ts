@@ -253,6 +253,7 @@ td code { color: var(--ink); font-weight: 500; }
 .cells { margin-top: 44px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--rule); }
 .cell { background: var(--bg); padding: 26px 24px 28px; }
 .cell.filler { display: flex; align-items: flex-end; }
+.cell.filler-narrow { display: none; }
 .cell-head { display: flex; align-items: baseline; gap: 12px; }
 .cell-head .tag { margin-left: auto; }
 .cell .path { margin-top: 10px; font-size: 12.5px; color: var(--ink); font-weight: 500; }
@@ -264,6 +265,7 @@ footer { padding: 46px 56px 72px; display: flex; flex-wrap: wrap; gap: 10px 28px
 @media (max-width: 1080px) {
   .cells { grid-template-columns: repeat(2, 1fr); }
   .cell.filler { display: none; }
+  .cell.filler-narrow { display: flex; align-items: flex-end; }
   .panes { grid-template-columns: 1fr; }
 }
 @media (max-width: 860px) {
@@ -282,6 +284,7 @@ footer { padding: 46px 56px 72px; display: flex; flex-wrap: wrap; gap: 10px 28px
   .hero { padding-top: 64px; }
   .facts { grid-template-columns: repeat(2, 1fr); }
   .cells { grid-template-columns: 1fr; }
+  .cell.filler-narrow { display: none; }
 }
 @media (max-width: 520px) {
   .fields { grid-template-columns: 1fr; }
@@ -491,6 +494,20 @@ function categoryCells(): string {
   ).join("");
 }
 
+/**
+ * Closes the last row of the cell grid, so a ragged row never shows the grid's
+ * own hairline background as a hole. The wide layout is three columns, the
+ * narrower one two, and the fillers are hidden when they are not needed.
+ */
+function fillerCells(): string {
+  const count = CATEGORY_SUMMARY.length;
+  const end = `<span class="tag">End of index · ${count}/${count}</span>`;
+  const fill = (columns: number, className: string) =>
+    Array.from({ length: (columns - (count % columns)) % columns }, (_unused, index) => `
+      <div class="cell ${className}" aria-hidden="true">${index === 0 ? end : ""}</div>`).join("");
+  return fill(3, "filler") + fill(2, "filler-narrow");
+}
+
 function aliasRows(): string {
   return CATEGORY_SUMMARY.map(
     (category) => `
@@ -512,7 +529,7 @@ export function renderHomepage(origin: string, canonical: string): string {
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SignaaS — Signature as a Service</title>
-<meta name="description" content="A tiny REST API that returns stylized email sign-offs in JSON, plain text or HTML. 14 tones, one URL."/>
+<meta name="description" content="A tiny REST API that returns stylized email sign-offs in JSON, plain text or HTML. Dozens of tones, one URL."/>
 <meta property="og:title" content="SignaaS — Signature as a Service"/>
 <meta property="og:description" content="GET /passive-aggressive/Alice. Stylized sign-offs as a service."/>
 <meta property="og:type" content="website"/>
@@ -560,8 +577,8 @@ export function renderHomepage(origin: string, canonical: string): string {
       <h1>Sign off with exactly the energy the moment deserves.</h1>
       <p class="lede">
         One GET request returns a stylized sign-off as JSON, plain text or HTML.
-        Fourteen tones, from Business to Existential Dread. No key, no signup,
-        no state to keep warm.
+        ${CATEGORY_SUMMARY.length} tones, from Business to Existential Dread. No key, no
+        signup, no state to keep warm.
       </p>
       <div class="curl mono"><span>$</span>curl ${origin}/passive-aggressive/Alice</div>
       <div class="facts">
@@ -688,16 +705,14 @@ $ curl -H 'Accept: text/html' '${origin}/business/John?title=VP%20of%20Sales'
     <section id="categories">
       <div class="sect-head">
         <span class="tag">02 — Tones</span>
-        <h2>Fourteen registers, ${TEMPLATE_COUNT} lines</h2>
+        <h2>${CATEGORY_SUMMARY.length} registers, ${TEMPLATE_COUNT} lines</h2>
         <p class="lede">
           Each tone holds a handful of templates; one is drawn per request, or
           pinned with <code>?seed=</code>.
         </p>
       </div>
 
-      <div class="cells">${categoryCells()}
-        <div class="cell filler" aria-hidden="true"><span class="tag">End of index · ${CATEGORY_SUMMARY.length}/${CATEGORY_SUMMARY.length}</span></div>
-      </div>
+      <div class="cells">${categoryCells()}${fillerCells()}</div>
 
       <span class="tag block-label">Slugs and aliases</span>
       <div class="table-wrap">

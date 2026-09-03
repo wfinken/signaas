@@ -53,13 +53,22 @@ $ curl -H 'Accept: text/html' 'https://signaas.cc/business/John?title=VP%20of%20
 
 ## Categories
 
+Twenty-eight tones, 485 templates.
+
 `normal`, `business`, `funny`, `mad`, `passive-aggressive`,
 `overly-enthusiastic`, `gen-z`, `cryptic`, `shakespearean`,
-`existential-dread`, `sci-fi`, `apocalyptic`, `pirate`, `needy`.
+`existential-dread`, `sci-fi`, `apocalyptic`, `pirate`, `needy`, `noir`,
+`cowboy`, `legalese`, `academic`, `founder`, `zen`, `haiku`, `coach`,
+`conspiracy`, `victorian`, `bureaucratic`, `infomercial`, `villain`, `tired`.
 
 Each has aliases (`robot` → `sci-fi`, `genz` → `gen-z`, `pa` →
-`passive-aggressive`, …) and several templates, one picked at random per
-request. `GET /categories` returns the authoritative list.
+`passive-aggressive`, `gumshoe` → `noir`, …) and seventeen or eighteen
+templates, one picked at random per request. `GET /categories` returns the
+authoritative list.
+
+Two tones carry a rule of their own: every `haiku` line is five syllables,
+seven, then five, written as three parts separated by ` / `; every
+`overly-enthusiastic` line shouts.
 
 ## Rate limiting
 
@@ -127,14 +136,16 @@ shadows and gradients.
 
 Adding a tone means adding an entry to `CATEGORIES` in `src/categories.ts`; the
 homepage, `/categories`, the OpenAPI document and the tests all read from that
-one array. A template is a `message` plus an optional `signer` (how the name is
+one array. Tests in `test/api.test.ts` hold the corpus to its shape: the tone
+and template totals, a lookup key no two tones share, and no sign-off repeated
+in any tone. A template is a `message` plus an optional `signer` (how the name is
 written, e.g. `"Cap'n {name}"`); both support the `{name}`, `{title}`,
 `{company}` and `{recipient}` placeholders.
 
 ```
 src/
   index.ts       routing, CORS, error shapes, HEAD/OPTIONS handling
-  categories.ts  the corpus: 14 categories and their templates
+  categories.ts  the corpus: 28 categories and their 485 templates
   signature.ts   template selection, substitution, JSON/text/HTML rendering
   sanitize.ts    input cleaning and HTML escaping
   negotiate.ts   Accept header parsing and ?format override

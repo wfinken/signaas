@@ -207,11 +207,6 @@ the OpenAPI `servers` list) comes from the `PUBLIC_ORIGIN` var in
 Documentation examples always use the origin the request arrived on, so a curl
 line copied from `localhost:8787` keeps working.
 
-## Roadmap
-
-Custom stored templates via authenticated `POST`, localized signatures
-(`/funny/es/Juan`), and browser extensions for Gmail and Outlook.
-
 ## License
 
 MIT — see [LICENSE](LICENSE).

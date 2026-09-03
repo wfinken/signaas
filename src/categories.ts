@@ -27,6 +27,11 @@ export interface Category {
 
 export { CATEGORIES };
 
+export const TOTAL_TEMPLATES = CATEGORIES.reduce(
+  (total, category) => total + category.templates.length,
+  0,
+);
+
 const INDEX = new Map<string, Category>();
 for (const category of CATEGORIES) {
   INDEX.set(category.slug, category);

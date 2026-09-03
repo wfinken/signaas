@@ -1,4 +1,4 @@
-import { CATEGORIES, findCategory, normalizeSlug } from "./categories";
+import { CATEGORIES, findCategory, normalizeSlug, TOTAL_TEMPLATES } from "./categories";
 import { canonicalOrigin } from "./config";
 import { countSignature, signaturesServed } from "./counter";
 import type { Env } from "./env";
@@ -200,6 +200,8 @@ async function handle(request: Request, env: Env, ctx: ExecutionContext): Promis
         return json({
           status: "ok",
           categories: CATEGORIES.length,
+          tones: CATEGORIES.length,
+          templates: TOTAL_TEMPLATES,
           served: await signaturesServed(env.DB),
         });
       case "categories":

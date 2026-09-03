@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATEGORIES } from "../src/categories";
+import { CATEGORIES, TOTAL_TEMPLATES } from "../src/categories";
 import { get, memoryKv } from "./helpers";
 
 describe("signature endpoint", () => {
@@ -184,7 +184,19 @@ describe("service endpoints", () => {
   });
 
   it("answers health checks", async () => {
-    expect((await get("/health")).status).toBe(200);
+    const response = await get("/health");
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as {
+      status: string;
+      categories: number;
+      tones: number;
+      templates: number;
+      served: number | null;
+    };
+    expect(body.status).toBe("ok");
+    expect(body.categories).toBe(CATEGORIES.length);
+    expect(body.tones).toBe(CATEGORIES.length);
+    expect(body.templates).toBe(TOTAL_TEMPLATES);
   });
 
   it("advertises the production domain as canonical", async () => {

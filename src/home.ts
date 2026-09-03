@@ -1,4 +1,4 @@
-import { CATEGORIES } from "./categories";
+import { CATEGORIES, TOTAL_TEMPLATES } from "./categories";
 import { REPOSITORY_URL } from "./config";
 import { buildSignature, toHtml, toText } from "./signature";
 
@@ -598,6 +598,10 @@ const SCRIPT = `
   var progress = document.getElementById("progress");
   var copyButton = document.getElementById("copy");
   var served = document.getElementById("served");
+  var railTones = document.getElementById("rail-tones");
+  var railTemplates = document.getElementById("rail-templates");
+  var factTones = document.getElementById("fact-tones");
+  var factTemplates = document.getElementById("fact-templates");
   var buttons = Array.prototype.slice.call(document.querySelectorAll(".formats button"));
   var timer = null;
 
@@ -643,17 +647,30 @@ const SCRIPT = `
     element.appendChild(block);
   }
 
+  /** Pulls live counts from /health to dynamically update served tally, tones, and templates. */
+  function updateHealth() {
+    fetch("/health", { headers: { accept: "application/json" } })
+      .then(function (response) { return response.json(); })
+      .then(function (health) {
+        if (typeof health.served === "number" && served) {
+          served.textContent = health.served.toLocaleString("en-US");
+        }
+        var tones = typeof health.tones === "number" ? health.tones : (typeof health.categories === "number" ? health.categories : null);
+        if (tones !== null) {
+          if (railTones) railTones.textContent = tones.toLocaleString("en-US");
+          if (factTones) factTones.textContent = tones.toLocaleString("en-US");
+        }
+        if (typeof health.templates === "number") {
+          if (railTemplates) railTemplates.textContent = health.templates.toLocaleString("en-US");
+          if (factTemplates) factTemplates.textContent = health.templates.toLocaleString("en-US");
+        }
+      })
+      .catch(function () { /* the tally is decoration; leave it be */ });
+  }
+
   /** The count is bumped after the response leaves, so give it a beat, then ask. */
   function refreshServed() {
-    if (!served) return;
-    setTimeout(function () {
-      fetch("/health", { headers: { accept: "application/json" } })
-        .then(function (response) { return response.json(); })
-        .then(function (health) {
-          if (typeof health.served === "number") served.textContent = health.served.toLocaleString("en-US");
-        })
-        .catch(function () { /* the tally is decoration; leave it be */ });
-    }, 400);
+    setTimeout(updateHealth, 400);
   }
 
   function waiting() {
@@ -809,6 +826,7 @@ const SCRIPT = `
 
   say(out, "It's a little quiet in here right now. Let's get your first request set up.");
   render();
+  updateHealth();
 })();
 `;
 
@@ -870,7 +888,7 @@ function aliasRows(): string {
   ).join("");
 }
 
-const TEMPLATE_COUNT = CATEGORY_SUMMARY.reduce((total, category) => total + category.templates, 0);
+const TEMPLATE_COUNT = TOTAL_TEMPLATES;
 
 /** The hero's running tally; nothing at all when nothing is counting. */
 function servedLine(served: number | null): string {
@@ -944,7 +962,7 @@ export function renderHomepage(
     <div class="rail-foot">
       Cloudflare Workers<br/>
       Stateless · MIT<br/>
-      ${CATEGORY_SUMMARY.length} tones · ${TEMPLATE_COUNT} templates
+      <span id="rail-tones">${CATEGORY_SUMMARY.length}</span> tones · <span id="rail-templates">${TEMPLATE_COUNT}</span> templates
     </div>
   </aside>
 
@@ -994,8 +1012,8 @@ export function renderHomepage(
           <div class="hero-curl mono"><span>$</span>curl ${origin}/passive-aggressive/Alice</div>
 
           <div class="facts">
-            <div><b>${CATEGORY_SUMMARY.length}</b><span class="label">Tones</span></div>
-            <div><b>${TEMPLATE_COUNT}</b><span class="label">Templates</span></div>
+            <div><b id="fact-tones">${CATEGORY_SUMMARY.length}</b><span class="label">Tones</span></div>
+            <div><b id="fact-templates">${TEMPLATE_COUNT}</b><span class="label">Templates</span></div>
             <div><b>3</b><span class="label">Formats</span></div>
             <div><b>0</b><span class="label">Signup steps</span></div>
           </div>

@@ -64,7 +64,7 @@ Base URL: `https://signaas.cc` (or `http://localhost:8787` locally)
 | `/random/:name` | `GET` | Russian roulette of sign-offs across all available tones |
 | `/categories` | `GET` | JSON catalogue of all 28+ tones, aliases, and template counts |
 | `/openapi.json` | `GET` | Full OpenAPI 3.1 schema specification |
-| `/health` | `GET` | Liveness probe & total count of signatures served |
+| `/health` | `GET` | Liveness probe & live counts (tones, templates, signatures served) |
 | `/` | `GET` | Interactive browser console & docs (or JSON index via `Accept: application/json`) |
 
 ---

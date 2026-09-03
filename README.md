@@ -113,26 +113,30 @@ $ npm run check      # both
 
 ### Homepage design
 
-The homepage is a single rendered string in `src/home.ts`, and it follows a few
-rules on purpose:
+The homepage is a single rendered string in `src/home.ts`. It aims to read as a
+quiet, well-made tool — cleanly engineered, and subtly welcoming with it:
 
-- **Two typefaces.** Space Grotesk sets every heading; JetBrains Mono sets
-  everything else, body copy included. Hierarchy comes from size and weight, not
-  from stacking bold, italic and colour on the same run of text.
-- **Two backgrounds.** Off-white `#f9f9f9` and true black `#050505`, chosen by
-  `prefers-color-scheme`. Nothing muddy in between.
-- **One accent.** Construction orange `#ff4a00`, spent only on the primary
-  action, live state, focus rings and failures. Once it starts decorating, it
-  has stopped meaning anything.
-- **Hard 1px rules, square corners, no shadows.** The grid is the ornament:
-  cells sit on a hairline background with a 1px gap, so the structure shows.
-- **No transitions.** Hover is a colour inversion that lands on the same frame
-  as the pointer. In-flight requests draw a 1px line sweeping the console and a
-  blinking block cursor, never a spinner.
+- **Two typefaces.** DM Sans sets headings and interface text; a rounded
+  monospace (Cascadia Code or SF Mono where they are installed, Fira Code
+  otherwise) sets anything a developer would copy. Order comes from weight and a
+  muted text colour, not from shouting.
+- **Warm, muted colour.** Paper is a warm off-white `#fdfcfb`, ink a soft
+  charcoal `#2c2a28`, and dark mode a soft deep slate `#1c1c1e`. Borders are
+  semi-transparent, so they suggest structure rather than draw it.
+- **One accent, plus two signals.** A soft terracotta `#9d5b3f` marks primary
+  actions and the API's own nouns; sage marks healthy state, clay marks a
+  failure. Every one of them is deepened until it clears 4.5:1 on its
+  background — muted is not the same as unreadable.
+- **Softened geometry.** 6px corners, generous padding, and shadows diffused to
+  3% opacity that only separate layers. The grid is still the frame, drawn
+  gently.
+- **Quietly helpful motion.** 150ms ease-in-out on hover and focus; hover fades
+  rather than inverts. A request in flight glides a slim accent bar and pulses
+  skeleton lines the shape of the answer, instead of a spinner.
 
 Tests in `test/api.test.ts` assert the parts that are easy to undo by accident:
-the two families, the accent value, and the absence of rounded corners,
-shadows and gradients.
+the two families, the accent value, no gradients, no corner rounder than 6px,
+no shadow above 25% opacity, and the 150ms easing.
 
 Adding a tone means adding an entry to `CATEGORIES` in `src/categories.ts`; the
 homepage, `/categories`, the OpenAPI document and the tests all read from that

@@ -111,6 +111,26 @@ describe("service endpoints", () => {
     expect(body).toContain('id="category"');
   });
 
+  it("carries the design system the homepage is built on", async () => {
+    const response = await get("/", { headers: { accept: "text/html" } });
+    const body = await response.text();
+    // Two typefaces, one accent, square corners: the homepage's whole visual argument.
+    expect(body).toContain("Space Grotesk");
+    expect(body).toContain("JetBrains Mono");
+    expect(body).toContain("--accent: #ff4a00");
+    const radii = body.match(/border-radius:[^;]*/g) ?? [];
+    expect(radii.filter((rule) => !/:\s*0$/.test(rule))).toEqual([]);
+    expect(body).not.toContain("box-shadow");
+    expect(body).not.toContain("linear-gradient");
+  });
+
+  it("writes empty and failure states with a voice", async () => {
+    const response = await get("/", { headers: { accept: "text/html" } });
+    const body = await response.text();
+    expect(body).toContain("It's awfully quiet in here.");
+    expect(body).toContain("never came back");
+  });
+
   it("serves a JSON index to API clients", async () => {
     const response = await get("/", { headers: { accept: "application/json" } });
     const body = (await response.json()) as { categories: string[] };

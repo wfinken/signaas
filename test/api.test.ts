@@ -134,6 +134,28 @@ describe("service endpoints", () => {
   it("answers health checks", async () => {
     expect((await get("/health")).status).toBe(200);
   });
+
+  it("advertises the production domain as canonical", async () => {
+    const response = await get("/", { headers: { accept: "text/html" } });
+    const body = await response.text();
+    expect(body).toContain('<link rel="canonical" href="https://signaas.cc/"/>');
+    expect(body).toContain('<meta property="og:url" content="https://signaas.cc/"/>');
+  });
+
+  it("lists the production server in the OpenAPI document", async () => {
+    const response = await get("/openapi.json");
+    const body = (await response.json()) as { servers: { url: string }[] };
+    expect(body.servers[0]?.url).toBe("https://signaas.cc");
+  });
+
+  it("lets PUBLIC_ORIGIN override the canonical origin", async () => {
+    const response = await get("/openapi.json", {}, { PUBLIC_ORIGIN: "https://staging.signaas.cc/" });
+    const body = (await response.json()) as { servers: { url: string }[] };
+    expect(body.servers.map((server) => server.url)).toEqual([
+      "https://staging.signaas.cc",
+      "https://signaas.cc",
+    ]);
+  });
 });
 
 describe("http semantics", () => {

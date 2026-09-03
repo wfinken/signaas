@@ -1,4 +1,5 @@
 import { CATEGORIES, findCategory, normalizeSlug } from "./categories";
+import { canonicalOrigin } from "./config";
 import type { Env } from "./env";
 import { CONTENT_TYPES, negotiateFormat, type Format } from "./negotiate";
 import { renderHomepage } from "./home";
@@ -160,6 +161,7 @@ function segments(pathname: string): string[] {
 async function handle(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const origin = url.origin;
+  const canonical = canonicalOrigin(env.PUBLIC_ORIGIN);
   const format = negotiateFormat(request, url);
   const path = segments(url.pathname);
 
@@ -174,7 +176,10 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
   if (path.length === 0) {
     if (format === "html") {
-      return respond(renderHomepage(origin), { format: "html", cache: "public, max-age=300" });
+      return respond(renderHomepage(origin, canonical), {
+        format: "html",
+        cache: "public, max-age=300",
+      });
     }
     if (format === "text") {
       return respond(
@@ -195,7 +200,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
       case "categories":
         return json(categoryCatalogue(origin), { cache: "public, max-age=3600" });
       case "openapi.json":
-        return json(openApiDocument(origin), { cache: "public, max-age=3600" });
+        return json(openApiDocument(origin, canonical), { cache: "public, max-age=3600" });
       case "robots.txt":
         return respond("User-agent: *\nAllow: /\n", { format: "text", cache: "public, max-age=86400" });
       case "favicon.ico":

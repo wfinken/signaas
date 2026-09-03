@@ -1,7 +1,7 @@
 import { CATEGORIES } from "./categories";
 
 /** OpenAPI 3.1 description of the service, generated from the live corpus. */
-export function openApiDocument(origin: string): unknown {
+export function openApiDocument(origin: string, canonical: string): unknown {
   const slugs = CATEGORIES.map((category) => category.slug);
   const optional = (name: string, description: string) => ({
     name,
@@ -19,7 +19,13 @@ export function openApiDocument(origin: string): unknown {
       description: "Signature as a Service: stylized sign-offs in JSON, plain text or HTML.",
       license: { name: "MIT" },
     },
-    servers: [{ url: origin }],
+    servers:
+      origin === canonical
+        ? [{ url: canonical, description: "Canonical origin" }]
+        : [
+            { url: canonical, description: "Canonical origin" },
+            { url: origin, description: "This deployment" },
+          ],
     paths: {
       "/{category}/{name}": {
         get: {

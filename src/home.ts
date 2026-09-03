@@ -237,7 +237,7 @@ function aliasRows(): string {
   ).join("");
 }
 
-export function renderHomepage(origin: string): string {
+export function renderHomepage(origin: string, canonical: string): string {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -247,6 +247,10 @@ export function renderHomepage(origin: string): string {
 <meta name="description" content="A tiny REST API that returns stylized email sign-offs in JSON, plain text or HTML. 14 tones, one URL."/>
 <meta property="og:title" content="SignaaS — Signature as a Service"/>
 <meta property="og:description" content="GET /passive-aggressive/Alice. Stylized sign-offs as a service."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="${canonical}/"/>
+<meta name="twitter:card" content="summary"/>
+<link rel="canonical" href="${canonical}/"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%8D%EF%B8%8F%3C/text%3E%3C/svg%3E"/>
 <style>${CSS}</style>
 </head>
@@ -382,7 +386,8 @@ $ curl -H 'Accept: text/html' '${origin}/business/John?title=VP%20of%20Sales'
 </main>
 
 <footer class="wrap">
-  SignaaS · Signature as a Service · running on Cloudflare Workers.
+  <a href="${canonical}/">${canonical.replace(/^https?:\/\//, "")}</a>
+  · Signature as a Service · running on Cloudflare Workers · MIT licensed.
 </footer>
 
 <script>${SCRIPT.replace("CATEGORY_DATA", () => jsonForScript(CATEGORY_SUMMARY))}</script>

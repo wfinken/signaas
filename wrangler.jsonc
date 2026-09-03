@@ -22,7 +22,7 @@
     "RATE_LIMIT": "100",
     // Canonical origin, used for <link rel=canonical> and OpenAPI servers.
     "PUBLIC_ORIGIN": "https://signaas.cc"
-  }
+  },
 
   // Rate limiting is enabled automatically once a KV namespace is bound as
   // RATE_LIMIT_KV. Without the binding the API still serves every request,

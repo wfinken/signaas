@@ -12,7 +12,7 @@ $ curl https://signaas.cc/passive-aggressive/Alice
 ```
 
 Runs on Cloudflare Workers: no database, no cold starts, no state to keep warm.
-The homepage doubles as the documentation and ships an interactive demo.
+The homepage doubles as the documentation and ships an interactive console.
 
 ## Endpoints
 
@@ -101,6 +101,29 @@ $ npm test           # vitest
 $ npm run typecheck  # tsc --noEmit
 $ npm run check      # both
 ```
+
+### Homepage design
+
+The homepage is a single rendered string in `src/home.ts`, and it follows a few
+rules on purpose:
+
+- **Two typefaces.** Space Grotesk sets every heading; JetBrains Mono sets
+  everything else, body copy included. Hierarchy comes from size and weight, not
+  from stacking bold, italic and colour on the same run of text.
+- **Two backgrounds.** Off-white `#f9f9f9` and true black `#050505`, chosen by
+  `prefers-color-scheme`. Nothing muddy in between.
+- **One accent.** Construction orange `#ff4a00`, spent only on the primary
+  action, live state, focus rings and failures. Once it starts decorating, it
+  has stopped meaning anything.
+- **Hard 1px rules, square corners, no shadows.** The grid is the ornament:
+  cells sit on a hairline background with a 1px gap, so the structure shows.
+- **No transitions.** Hover is a colour inversion that lands on the same frame
+  as the pointer. In-flight requests draw a 1px line sweeping the console and a
+  blinking block cursor, never a spinner.
+
+Tests in `test/api.test.ts` assert the parts that are easy to undo by accident:
+the two families, the accent value, and the absence of rounded corners,
+shadows and gradients.
 
 Adding a tone means adding an entry to `CATEGORIES` in `src/categories.ts`; the
 homepage, `/categories`, the OpenAPI document and the tests all read from that

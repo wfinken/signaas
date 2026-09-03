@@ -6,9 +6,22 @@
   "observability": {
     "enabled": true
   },
+
+  // The production domain. Both entries require signaas.cc to be an active
+  // zone on this Cloudflare account; wrangler then creates the DNS records
+  // itself. If a deploy fails with "could not find zone", add the domain
+  // under Websites in the dashboard (or move its nameservers to Cloudflare)
+  // and redeploy.
+  "routes": [
+    { "pattern": "signaas.cc", "custom_domain": true },
+    { "pattern": "www.signaas.cc", "custom_domain": true }
+  ],
+
   "vars": {
     // Free-tier allowance, per IP, per rolling hour window.
-    "RATE_LIMIT": "100"
+    "RATE_LIMIT": "100",
+    // Canonical origin, used for <link rel=canonical> and OpenAPI servers.
+    "PUBLIC_ORIGIN": "https://signaas.cc"
   }
 
   // Rate limiting is enabled automatically once a KV namespace is bound as
@@ -26,10 +39,4 @@
   // Paid-tier keys bypass the limit. Set them as a secret (comma separated):
   //
   //   npx wrangler secret put API_KEYS
-  //
-  // Once signaas.io is on this Cloudflare account, add:
-  //
-  // "routes": [
-  //   { "pattern": "signaas.io", "custom_domain": true }
-  // ]
 }

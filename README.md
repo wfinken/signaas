@@ -4,7 +4,7 @@ A tiny, stateless REST API that returns stylized sign-offs. Pass a tone and a
 name in the URL, get back a signature in JSON, plain text, or HTML.
 
 ```console
-$ curl https://signaas.io/passive-aggressive/Alice
+$ curl https://signaas.cc/passive-aggressive/Alice
 {
   "message": "I trust you can figure it out from here.",
   "subtitle": "— Alice"
@@ -42,11 +42,11 @@ default when nothing matches. Seeded responses are cacheable
 (`public, max-age=86400`); unseeded ones are `no-store`, since they are random.
 
 ```console
-$ curl -H 'Accept: text/plain' https://signaas.io/pirate/Blackbeard
+$ curl -H 'Accept: text/plain' https://signaas.cc/pirate/Blackbeard
 May yer anchor be tight and yer compass true.
 — Cap'n Blackbeard
 
-$ curl -H 'Accept: text/html' 'https://signaas.io/business/John?title=VP%20of%20Sales'
+$ curl -H 'Accept: text/html' 'https://signaas.cc/business/John?title=VP%20of%20Sales'
 <p>Yours in synergy,</p>
 <p><strong>John</strong><br/><em>VP of Sales</em></p>
 ```
@@ -134,12 +134,18 @@ Manual deploys use the same command:
 $ npx wrangler deploy
 ```
 
-Once `signaas.io` is on the account, add the custom domain to
-`wrangler.jsonc`:
+The production domain `signaas.cc` (and `www.signaas.cc`) is already declared
+in `wrangler.jsonc` as a custom domain. Both entries need `signaas.cc` to be an
+active zone on the same Cloudflare account: add it under **Websites** in the
+dashboard, or point the registrar's nameservers at Cloudflare. Wrangler creates
+the DNS records itself on deploy; a deploy that fails with *could not find
+zone* means the domain has not been added to the account yet.
 
-```jsonc
-"routes": [{ "pattern": "signaas.io", "custom_domain": true }]
-```
+The canonical origin the site advertises (`<link rel="canonical">`, `og:url`,
+the OpenAPI `servers` list) comes from the `PUBLIC_ORIGIN` var in
+`wrangler.jsonc`, so a fork or a preview deploy can advertise its own address.
+Documentation examples always use the origin the request arrived on, so a curl
+line copied from `localhost:8787` keeps working.
 
 ## Roadmap
 

@@ -4,7 +4,7 @@ import type { Env } from "../src/env";
 export const EMPTY_ENV: Env = {};
 
 export function get(path: string, init: RequestInit = {}, env: Env = EMPTY_ENV) {
-  const request = new Request("https://signaas.io" + path, { method: "GET", ...init });
+  const request = new Request("https://signaas.cc" + path, { method: "GET", ...init });
   return worker.fetch(request, env);
 }
 

@@ -1,0 +1,21 @@
+Normal
+description: Standard, polite sign-offs that will never get you in trouble.
+aliases: standard, polite
+
+Best regards,
+Kind regards,
+Thanks for your time,
+All the best,
+Looking forward to hearing from you,
+Warm regards,
+Talk soon,
+Many thanks,
+With appreciation,
+Sincerely,
+Yours truly,
+Thanks again for your help,
+Have a good week,
+Appreciate you taking a look,
+Let me know what you think,
+Speak soon,
+Cheers,

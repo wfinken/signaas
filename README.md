@@ -14,6 +14,10 @@ $ curl https://signaas.cc/passive-aggressive/Alice
 Runs on Cloudflare Workers: no database, no cold starts, no state to keep warm.
 The homepage doubles as the documentation and ships an interactive console.
 
+Every tone is a plain text file in [`categories/`](categories), so adding one —
+or adding a single good sign-off to one that exists — is a text edit you can
+make in the browser. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Endpoints
 
 | Endpoint | Returns |
@@ -53,22 +57,27 @@ $ curl -H 'Accept: text/html' 'https://signaas.cc/business/John?title=VP%20of%20
 
 ## Categories
 
-Twenty-eight tones, 485 templates.
+Every tone is a text file in [`categories/`](categories): the file name is the
+URL, the first line is the display name, and the rest of the file is one
+sign-off per line.
 
-`normal`, `business`, `funny`, `mad`, `passive-aggressive`,
-`overly-enthusiastic`, `gen-z`, `cryptic`, `shakespearean`,
-`existential-dread`, `sci-fi`, `apocalyptic`, `pirate`, `needy`, `noir`,
-`cowboy`, `legalese`, `academic`, `founder`, `zen`, `haiku`, `coach`,
-`conspiracy`, `victorian`, `bureaucratic`, `infomercial`, `villain`, `tired`.
+```
+Pirate
+description: Swashbuckling sign-offs for the seven seas.
+aliases: pirates, arr, buccaneer
+signer: Cap'n {name}
 
-Each has aliases (`robot` → `sci-fi`, `genz` → `gen-z`, `pa` →
-`passive-aggressive`, `gumshoe` → `noir`, …) and seventeen or eighteen
-templates, one picked at random per request. `GET /categories` returns the
-authoritative list.
+Fair winds and following seas,
+Reply swift, or walk the plank.
+```
 
-Two tones carry a rule of their own: every `haiku` line is five syllables,
-seven, then five, written as three parts separated by ` / `; every
-`overly-enthusiastic` line shouts.
+Each tone has a handful of aliases (`robot` → `sci-fi`, `genz` → `gen-z`, `pa` →
+`passive-aggressive`, `gumshoe` → `noir`, …) and a dozen or more sign-offs, one
+picked at random per request. `GET /categories` returns the authoritative list.
+
+Adding a tone or a line is a text edit, and needs no other change:
+[CONTRIBUTING.md](CONTRIBUTING.md) has the two-minute version and
+[`categories/README.md`](categories/README.md) has the full format.
 
 ## Rate limiting
 
@@ -111,6 +120,19 @@ $ npm run typecheck  # tsc --noEmit
 $ npm run check      # both
 ```
 
+### The corpus
+
+The corpus is not in the TypeScript. `scripts/build-corpus.mjs` reads
+`categories/*.txt` and writes `src/corpus.generated.ts`, which is gitignored and
+rebuilt automatically before `dev`, `test`, `typecheck`, `deploy` and on
+`npm install` — so a contributor adds a text file and nothing else. Run it on
+its own with `npm run corpus`; it reports the first problem it finds with the
+file and line number.
+
+Tests hold the corpus to its shape: one lookup key per tone, no sign-off
+repeated anywhere, the haiku form, and that the bundled corpus matches the files
+on disk.
+
 ### Homepage design
 
 The homepage is a single rendered string in `src/home.ts`. It aims to read as a
@@ -138,18 +160,13 @@ Tests in `test/api.test.ts` assert the parts that are easy to undo by accident:
 the two families, the accent value, no gradients, no corner rounder than 6px,
 no shadow above 25% opacity, and the 150ms easing.
 
-Adding a tone means adding an entry to `CATEGORIES` in `src/categories.ts`; the
-homepage, `/categories`, the OpenAPI document and the tests all read from that
-one array. Tests in `test/api.test.ts` hold the corpus to its shape: the tone
-and template totals, a lookup key no two tones share, and no sign-off repeated
-in any tone. A template is a `message` plus an optional `signer` (how the name is
-written, e.g. `"Cap'n {name}"`); both support the `{name}`, `{title}`,
-`{company}` and `{recipient}` placeholders.
-
 ```
+categories/      the corpus: one text file per tone, and its format guide
+scripts/
+  build-corpus.mjs  reads categories/*.txt into src/corpus.generated.ts
 src/
   index.ts       routing, CORS, error shapes, HEAD/OPTIONS handling
-  categories.ts  the corpus: 28 categories and their 485 templates
+  categories.ts  corpus types, slug/alias lookup
   signature.ts   template selection, substitution, JSON/text/HTML rendering
   sanitize.ts    input cleaning and HTML escaping
   negotiate.ts   Accept header parsing and ?format override
@@ -163,14 +180,19 @@ src/
 Cloudflare Workers, configured in `wrangler.jsonc`. Connecting the repository
 to a Cloudflare Workers Build deploys every push to `main` automatically:
 
-- Build command: `npm install` (the Worker is TypeScript, bundled at deploy time)
-- Deploy command: `npx wrangler deploy`
+- Build command: `npm install` (the Worker is TypeScript, bundled at deploy time;
+  the install also builds the corpus out of `categories/*.txt`)
+- Deploy command: `npm run deploy`
 
 Manual deploys use the same command:
 
 ```console
-$ npx wrangler deploy
+$ npm run deploy
 ```
+
+`npm run deploy` rebuilds the corpus and then runs `wrangler deploy`. Bare
+`npx wrangler deploy` works too, as long as `npm install` has run in the
+checkout at some point.
 
 The production domain `signaas.cc` (and `www.signaas.cc`) is already declared
 in `wrangler.jsonc` as a custom domain. Both entries need `signaas.cc` to be an

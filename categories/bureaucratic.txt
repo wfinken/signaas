@@ -1,0 +1,21 @@
+Bureaucratic
+description: Forms, reference numbers, and an office that closes at four.
+aliases: red-tape, admin, paperwork
+
+Please retain this message for your records.
+Your request has been received and placed in a queue.
+This matter falls outside the scope of this department.
+Kindly resubmit using the correct form.
+A decision is expected within eight to twelve weeks.
+The office is closed for processing until further notice.
+Reference this thread in all future correspondence.
+Approval is pending approval.
+Your position in the queue has not changed.
+This response does not constitute a response.
+Please do not reply to this address.
+Escalation requires a separate form.
+Duly noted and filed,
+Processed in the order received,
+Stamped, dated, and forwarded,
+Yours administratively,
+Signed on behalf of the department, | {name}, Processing

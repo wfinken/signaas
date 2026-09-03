@@ -1,0 +1,22 @@
+Victorian
+description: Nineteenth-century correspondence, unnecessarily obliged.
+aliases: regency, edwardian, obedient-servant
+
+I trust this finds you in tolerable health.
+Forgive the liberty of this correspondence.
+I have the honour to be, most sincerely,
+Pray convey my regards to the household.
+It would gratify me exceedingly to hear from you.
+I am, as ever, at your disposal.
+Let us not speak of the postage.
+With the very warmest esteem,
+I shall await your favour by the next post.
+Believe me, I remain entirely yours,
+Should the weather permit, I shall call on Thursday.
+I beg you will excuse the brevity of this note.
+It is a small matter, and yet I could not rest.
+I dare not presume further upon your patience.
+Written in haste, and with great feeling,
+Yours in the deepest respect,
+I remain, sir or madam, your most obedient servant, | {name}
+Your humble correspondent, | {name}, Esq.

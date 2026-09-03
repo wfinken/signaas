@@ -7,4 +7,6 @@ export interface Env {
   API_KEYS?: string;
   /** Optional. Bind a KV namespace to turn on free-tier rate limiting. */
   RATE_LIMIT_KV?: KVNamespace;
+  /** Optional. Bind a D1 database to count the signatures served. */
+  DB?: D1Database;
 }

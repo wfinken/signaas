@@ -201,6 +201,12 @@ section {
 .hero { padding-top: 96px; padding-bottom: 88px; }
 .hero h1 { max-width: 18ch; }
 .hero .lede { font-size: 18px; color: var(--ink-soft); margin-top: 24px; }
+.served {
+  margin-top: 22px; display: inline-flex; align-items: center; gap: 9px;
+  font-size: 14px; color: var(--sage); background: var(--sage-soft);
+  padding: 6px 13px 6px 11px; border-radius: var(--radius);
+}
+.served b { font-weight: 600; font-variant-numeric: tabular-nums; }
 .hero .curl {
   margin-top: 36px; background: var(--card); border: 1px solid var(--line);
   border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px;
@@ -451,6 +457,7 @@ const SCRIPT = `
   var status = document.getElementById("status");
   var progress = document.getElementById("progress");
   var copyButton = document.getElementById("copy");
+  var served = document.getElementById("served");
   var buttons = Array.prototype.slice.call(document.querySelectorAll(".formats button"));
   var timer = null;
 
@@ -496,6 +503,19 @@ const SCRIPT = `
     element.appendChild(block);
   }
 
+  /** The count is bumped after the response leaves, so give it a beat, then ask. */
+  function refreshServed() {
+    if (!served) return;
+    setTimeout(function () {
+      fetch("/health", { headers: { accept: "application/json" } })
+        .then(function (response) { return response.json(); })
+        .then(function (health) {
+          if (typeof health.served === "number") served.textContent = health.served.toLocaleString("en-US");
+        })
+        .catch(function () { /* the tally is decoration; leave it be */ });
+    }, 400);
+  }
+
   function waiting() {
     skeleton(out, ["22%", "86%", "64%", "18%"]);
     skeleton(preview, ["78%", "34%"]);
@@ -525,6 +545,7 @@ const SCRIPT = `
           status.textContent = response.status + " · " + took + "ms";
           status.className = response.ok ? "label ok" : "label warn";
           show(body);
+          if (response.ok) refreshServed();
         });
       })
       .catch(function () {
@@ -693,7 +714,18 @@ function aliasRows(): string {
 
 const TEMPLATE_COUNT = CATEGORY_SUMMARY.reduce((total, category) => total + category.templates, 0);
 
-export function renderHomepage(origin: string, canonical: string): string {
+/** The hero's running tally; nothing at all when nothing is counting. */
+function servedLine(served: number | null): string {
+  if (served === null) return "";
+  const count = served.toLocaleString("en-US");
+  return `<p class="served"><span class="dot"></span><b id="served">${count}</b> signatures served</p>`;
+}
+
+export function renderHomepage(
+  origin: string,
+  canonical: string,
+  served: number | null = null,
+): string {
   const host = canonical.replace(/^https?:\/\//, "");
   return `<!doctype html>
 <html lang="en">
@@ -753,6 +785,7 @@ export function renderHomepage(origin: string, canonical: string): string {
         ${CATEGORY_SUMMARY.length} tones, from Business to Existential Dread. No key, no
         signup, no state to keep warm.
       </p>
+      ${servedLine(served)}
       <div class="curl mono"><span>$</span>curl ${origin}/passive-aggressive/Alice</div>
       <div class="facts">
         <div><b>${CATEGORY_SUMMARY.length}</b><span class="label">Tones</span></div>

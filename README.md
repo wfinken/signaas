@@ -1,233 +1,252 @@
-# SignaaS — Signature as a Service
+# ✍️ SignaaS — Signatures as a Service
 
-A tiny, stateless REST API that returns stylized sign-offs. Pass a tone and a
-name in the URL, get back a signature in JSON, plain text, or HTML.
+[![CI](https://github.com/wfinken/signaas/actions/workflows/ci.yml/badge.svg)](https://github.com/wfinken/signaas/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](package.json)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflareworkers&logoColor=white)](https://workers.cloudflare.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
+> **Life is too short for "Best regards" and "Hope this email finds you well" (it never does).**  
+> **SignaaS** is a blisteringly fast, stateless micro-API that serves up stylized, contextual, and delightfully unhinged email sign-offs on demand.
+
+---
+
+## ⚡ TL;DR
+
+Need a passive-aggressive sign-off for that email that definitely could have been a Slack message?
 
 ```console
 $ curl https://signaas.cc/passive-aggressive/Alice
+```
+
+```json
 {
   "message": "I trust you can figure it out from here.",
   "subtitle": "— Alice"
 }
 ```
 
-Runs on Cloudflare Workers: no database, no cold starts, no state to keep warm.
-The homepage doubles as the documentation and ships an interactive console.
-
-Every tone is a plain text file in [`categories/`](categories), so adding one —
-or adding a single good sign-off to one that exists — is a text edit you can
-make in the browser. See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Endpoints
-
-| Endpoint | Returns |
-| --- | --- |
-| `GET /:category/:name` | A signature in the negotiated format |
-| `GET /random/:name` | A signature from a randomly chosen category |
-| `GET /categories` | JSON catalogue of categories, aliases and template counts |
-| `GET /openapi.json` | OpenAPI 3.1 description of the service |
-| `GET /health` | Liveness probe |
-| `GET /` | Homepage and docs (HTML), or a JSON service index for API clients |
-
-### Query parameters
-
-| Parameter | Effect |
-| --- | --- |
-| `title` | Appended to the attribution; italicised on its own line in HTML |
-| `company` | Appended after the title |
-| `recipient` (or `to`) | Available to templates that address someone directly |
-| `format` | `json`, `text` or `html`; overrides the `Accept` header |
-| `seed` | Pins the template choice, so the same seed always returns the same line |
-
-### Content negotiation
-
-The `Accept` header selects the representation; `application/json` is the
-default when nothing matches. Seeded responses are cacheable
-(`public, max-age=86400`); unseeded ones are `no-store`, since they are random.
+Or how about sealing a deal on the high seas?
 
 ```console
-$ curl -H 'Accept: text/plain' https://signaas.cc/pirate/Blackbeard
+$ curl -H "Accept: text/plain" https://signaas.cc/pirate/Blackbeard
+```
+
+```text
 May yer anchor be tight and yer compass true.
 — Cap'n Blackbeard
-
-$ curl -H 'Accept: text/html' 'https://signaas.cc/business/John?title=VP%20of%20Sales'
-<p>Yours in synergy,</p>
-<p><strong>John</strong><br/><em>VP of Sales</em></p>
 ```
 
-## Categories
+---
 
-Every tone is a text file in [`categories/`](categories): the file name is the
-URL, the first line is the display name, and the rest of the file is one
-sign-off per line.
+## 🧐 What is SignaaS?
 
-```
-Pirate
-description: Swashbuckling sign-offs for the seven seas.
-aliases: pirates, arr, buccaneer
-signer: Cap'n {name}
+Ever stared blankly at an email draft wondering how to close without sounding like an automated insurance bot? **SignaaS (Signatures as a Service)** fixes that.
 
-Fair winds and following seas,
-Reply swift, or walk the plank.
-```
+- ⚡ **Edge-Native**: Runs on **Cloudflare Workers** with zero cold starts and global low-latency responses.
+- 🎭 **28+ Curated Tones**: From `existential-dread` and `pirate` to `passive-aggressive`, `noir`, `haiku`, and corporate `business`.
+- 🔄 **Content Negotiation**: Delivers formatted `application/json`, `text/plain`, or email-ready `text/html`.
+- 🎲 **Deterministic Seeding**: Pin templates with `?seed=foo` for predictable, edge-cached outputs.
+- 🛡️ **Zero Injection Risk**: Strict input normalization and HTML escaping keep your email signatures clean and safe.
+- 🧩 **Zero-Config Setup**: Works out of the box with zero external dependencies, plus optional KV rate-limiting and D1 tallying.
 
-Each tone has a handful of aliases (`robot` → `sci-fi`, `genz` → `gen-z`, `pa` →
-`passive-aggressive`, `gumshoe` → `noir`, …) and a dozen or more sign-offs, one
-picked at random per request. `GET /categories` returns the authoritative list.
+---
 
-Adding a tone or a line is a text edit, and needs no other change:
-[CONTRIBUTING.md](CONTRIBUTING.md) has the two-minute version and
-[`categories/README.md`](categories/README.md) has the full format.
+## 🚀 Quickstart & API Reference
 
-## Rate limiting
+Base URL: `https://signaas.cc` (or `http://localhost:8787` locally)
 
-The free tier allows 100 requests per IP per hour, reported through
-`X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset`. Exceeding
-it returns `429` with `Retry-After`. Paid-tier keys travel in
-`Authorization: Bearer <key>` and skip the limit entirely.
+### 📍 Core Endpoints
 
-Counting is backed by KV, and is **off until a KV namespace is bound**, so a
-first deploy works with no setup. To turn it on:
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/:category/:name` | `GET` | Generate a stylized signature for `:name` in `:category` |
+| `/random/:name` | `GET` | Russian roulette of sign-offs across all available tones |
+| `/categories` | `GET` | JSON catalogue of all 28+ tones, aliases, and template counts |
+| `/openapi.json` | `GET` | Full OpenAPI 3.1 schema specification |
+| `/health` | `GET` | Liveness probe & total count of signatures served |
+| `/` | `GET` | Interactive browser console & docs (or JSON index via `Accept: application/json`) |
 
+---
+
+### 🎛️ Query Parameters
+
+Tune your sign-off to perfection with query parameters:
+
+| Parameter | Type | Description | Example |
+| :--- | :--- | :--- | :--- |
+| `title` | `string` | Appends a job title to the signer attribution | `?title=VP%20of%20Overthinking` |
+| `company` | `string` | Appends company or organization name | `?company=Acme%20Corp` |
+| `recipient` / `to` | `string` | Target recipient for templates that address someone directly | `?recipient=Dave` |
+| `format` | `string` | Output format: `json`, `text`, or `html` (overrides `Accept` header) | `?format=html` |
+| `seed` | `string` | Deterministic template selector (cached at edge for 24h) | `?seed=ticket-4091` |
+
+---
+
+### 🎨 Content Negotiation & Formats
+
+SignaaS speaks whatever language your application prefers. Use standard HTTP `Accept` headers or pass `?format=`:
+
+#### 1. JSON (Default)
 ```console
-$ npx wrangler kv namespace create RATE_LIMIT_KV
+$ curl "https://signaas.cc/business/John?title=VP%20of%20Synergy&company=Initech"
+```
+```json
+{
+  "message": "Let's circle back and operationalize this paradigm.",
+  "subtitle": "— John, VP of Synergy, Initech"
+}
 ```
 
-then uncomment the `kv_namespaces` block in `wrangler.jsonc` and paste the id.
-Set the paid keys as a secret (comma separated):
-
+#### 2. Plain Text (`Accept: text/plain` or `?format=text`)
 ```console
-$ npx wrangler secret put API_KEYS
+$ curl -H "Accept: text/plain" "https://signaas.cc/noir/Spade?recipient=Client"
+```
+```text
+Watch your back in the rain, Client.
+— Spade
 ```
 
-Adjust the allowance with the `RATE_LIMIT` var in `wrangler.jsonc`.
-
-## Signatures served
-
-The homepage hero carries a running tally — *12,345 signatures served* — and
-`GET /health` reports the same number as `served`. Every successful signature
-response adds one; documentation, catalogue and health requests do not count.
-
-The tally lives in a D1 database and is **off until one is bound**, so a first
-deploy works with no setup: the API serves every request, the homepage leaves
-the line out, and `/health` reports `"served": null`. To turn it on:
-
+#### 3. HTML (`Accept: text/html` or `?format=html`)
 ```console
-$ npx wrangler d1 create signaas
+$ curl -H "Accept: text/html" "https://signaas.cc/victorian/Evelyn?title=Duchess"
+```
+```html
+<p>I remain, as ever, your most humble and obedient servant,</p>
+<p><strong>Evelyn</strong><br/><em>Duchess</em></p>
 ```
 
-then uncomment the `d1_databases` block in `wrangler.jsonc` and paste the id.
-The Worker creates its one table on first use, so there is no migration to
-run; `migrations/0001_counters.sql` holds the same schema for anyone who would
-rather apply it explicitly. The increment runs after each response has left,
-and a failure to count is logged and never surfaces to a caller.
+---
 
-## Security
+## 🎭 Tone Catalog
 
-`:name` and every query parameter are normalised, stripped of control,
-zero-width and bidi-override characters, collapsed to single spaces, and capped
-at 64 characters before they reach a template. HTML output escapes `& < > " '`,
-so a name can never inject markup into an email signature. CORS is open on
-every endpoint; only `GET`, `HEAD` and `OPTIONS` are accepted.
+SignaaS ships with 28+ tones (and friendly aliases). A taste of what's inside:
 
-## Development
+| Tone | Aliases | Sample Sign-Off |
+| :--- | :--- | :--- |
+| 😒 **`passive-aggressive`** | `pa` | *"Per my previous email that you evidently skimmed,"* |
+| 🏴‍☠️ **`pirate`** | `arr`, `buccaneer` | *"Fair winds, and keep a weather eye on the horizon,"* |
+| 🕶️ **`noir`** | `gumshoe`, `detective` | *"The city never sleeps, and neither do the mistakes,"* |
+| ☕ **`tired`** | `exhausted`, `sleepy` | *"Sent from my bed at an unreasonable hour,"* |
+| 🦹 **`villain`** | `evil`, `nemesis` | *"Until our inevitable final clash,"* |
+| 🌌 **`existential-dread`** | `void`, `nihilism` | *"Into the howling silence of an uncaring cosmos,"* |
+| 🚀 **`sci-fi`** | `robot`, `cyber` | *"May your subroutines execute without interrupt,"* |
+| 📜 **`shakespearean`** | `bard` | *"Fare thee well, and let fortune guide thy quill,"* |
+| 🧢 **`gen-z`** | `zoomer` | *"no cap fr fr,"* |
+| 🍶 **`haiku`** | — | *"Inbox reaches zero / Brief peace descends on my soul / New message arrives,"* |
 
+Fetch the live, complete catalog anytime:
 ```console
-$ npm install
-$ npm run dev        # wrangler dev on http://localhost:8787
-$ npm test           # vitest
-$ npm run typecheck  # tsc --noEmit
-$ npm run check      # both
+$ curl https://signaas.cc/categories
 ```
 
-### The corpus
+---
 
-The corpus is not in the TypeScript. `scripts/build-corpus.mjs` reads
-`categories/*.txt` and writes `src/corpus.generated.ts`, which is gitignored and
-rebuilt automatically before `dev`, `test`, `typecheck`, `deploy` and on
-`npm install` — so a contributor adds a text file and nothing else. Run it on
-its own with `npm run corpus`; it reports the first problem it finds with the
-file and line number.
+## 💻 Running Locally
 
-Tests hold the corpus to its shape: one lookup key per tone, no sign-off
-repeated anywhere, the haiku form, and that the bundled corpus matches the files
-on disk.
+Running SignaaS locally is quick and painless.
 
-### Homepage design
+### 📋 Prerequisites
 
-The homepage is a single rendered string in `src/home.ts`. It aims to read as a
-quiet, well-made tool — cleanly engineered, and subtly welcoming with it:
+- **Node.js**: v22+ (managed via `.nvmrc` or `.node-version`)
+- **npm**: v10+
 
-- **Two typefaces.** DM Sans sets headings and interface text; a rounded
-  monospace (Cascadia Code or SF Mono where they are installed, Fira Code
-  otherwise) sets anything a developer would copy. Order comes from weight and a
-  muted text colour, not from shouting.
-- **Warm, muted colour.** Paper is a warm off-white `#fdfcfb`, ink a soft
-  charcoal `#2c2a28`, and dark mode a soft deep slate `#1c1c1e`. Borders are
-  semi-transparent, so they suggest structure rather than draw it.
-- **One accent, plus two signals.** A soft terracotta `#9d5b3f` marks primary
-  actions and the API's own nouns; sage marks healthy state, clay marks a
-  failure. Every one of them is deepened until it clears 4.5:1 on its
-  background — muted is not the same as unreadable.
-- **Softened geometry.** 6px corners, generous padding, and shadows diffused to
-  3% opacity that only separate layers. The grid is still the frame, drawn
-  gently.
-- **Quietly helpful motion.** 150ms ease-in-out on hover and focus; hover fades
-  rather than inverts. A request in flight glides a slim accent bar and pulses
-  skeleton lines the shape of the answer, instead of a spinner.
+### 🛠️ Setup & Dev Server
 
-Tests in `test/api.test.ts` assert the parts that are easy to undo by accident:
-the two families, the accent value, no gradients, no corner rounder than 6px,
-no shadow above 25% opacity, and the 150ms easing.
+```bash
+# 1. Clone the repository
+git clone https://github.com/wfinken/signaas.git
+cd signaas
 
-```
-categories/      the corpus: one text file per tone, and its format guide
-scripts/
-  build-corpus.mjs  reads categories/*.txt into src/corpus.generated.ts
-src/
-  index.ts       routing, CORS, error shapes, HEAD/OPTIONS handling
-  categories.ts  corpus types, slug/alias lookup
-  signature.ts   template selection, substitution, JSON/text/HTML rendering
-  sanitize.ts    input cleaning and HTML escaping
-  negotiate.ts   Accept header parsing and ?format override
-  ratelimit.ts   KV-backed fixed window counter, API key bypass
-  home.ts        the homepage, generated from the corpus
-  openapi.ts     OpenAPI 3.1 document, generated from the corpus
+# 2. Install dependencies (automatically builds the template corpus)
+npm install
+
+# 3. Start local development server on http://localhost:8787
+npm run dev
 ```
 
-## Deployment
-
-Cloudflare Workers, configured in `wrangler.jsonc`. Connecting the repository
-to a Cloudflare Workers Build deploys every push to `main` automatically:
-
-- Build command: `npm install` (the Worker is TypeScript, bundled at deploy time;
-  the install also builds the corpus out of `categories/*.txt`)
-- Deploy command: `npm run deploy`
-- Node.js version: Specified via `.nvmrc` and `.node-version` (Node 22) for Wrangler compatibility and fast build initialization.
-
-Manual deploys use the same command:
-
+Test it in your terminal:
 ```console
-$ npm run deploy
+$ curl http://localhost:8787/cowboy/Woody
 ```
 
-`npm run deploy` rebuilds the corpus and then runs `wrangler deploy`. Bare
-`npx wrangler deploy` works too, as long as `npm install` has run in the
-checkout at some point.
+---
 
-The production domain `signaas.cc` (and `www.signaas.cc`) is already declared
-in `wrangler.jsonc` as a custom domain. Both entries need `signaas.cc` to be an
-active zone on the same Cloudflare account: add it under **Websites** in the
-dashboard, or point the registrar's nameservers at Cloudflare. Wrangler creates
-the DNS records itself on deploy; a deploy that fails with *could not find
-zone* means the domain has not been added to the account yet.
+## 🧪 Testing & Quality Checks
 
-The canonical origin the site advertises (`<link rel="canonical">`, `og:url`,
-the OpenAPI `servers` list) comes from the `PUBLIC_ORIGIN` var in
-`wrangler.jsonc`, so a fork or a preview deploy can advertise its own address.
-Documentation examples always use the origin the request arrived on, so a curl
-line copied from `localhost:8787` keeps working.
+SignaaS is backed by an automated test suite verifying corpus integrity, text sanitization, rate limits, and endpoint routing:
 
-## License
+```bash
+# Run Vitest test suite
+npm test
 
-MIT — see [LICENSE](LICENSE).
+# Run TypeScript type check
+npm run typecheck
+
+# Run both in one step
+npm run check
+
+# Rebuild and validate the corpus independently
+npm run corpus
+```
+
+---
+
+## ✍️ Adding New Tones & Lines
+
+The entire template corpus is stored as plain text files in [`categories/`](categories). Adding a new tone—or contributing a witty sign-off—requires **zero TypeScript changes**:
+
+1. Create or edit `categories/<tone-name>.txt`:
+   ```text
+   Vampire
+   description: Midnight musings from the creature of the night.
+   aliases: dracula, nosferatu
+   signer: Count {name}
+
+   Until the moon wanes,
+   Yours in eternal darkness,
+   Watch your neck, | {name}, Creature of the Night
+   ```
+2. Run `npm run corpus` (validates duplicates, formatting, and compiles to TypeScript).
+3. Open a Pull Request! See [CONTRIBUTING.md](CONTRIBUTING.md) for full formatting details.
+
+---
+
+## 🛡️ Security & Input Sanitization
+
+SignaaS takes email safety seriously:
+- **Character Sanitization**: Path segments and query parameters are stripped of control codes, zero-width spaces, and bidirectional overrides.
+- **Length Caps**: Inputs are bounded to 64 characters to prevent template blowout.
+- **HTML Escaping**: All dynamic variables in HTML responses escape `&`, `<`, `>`, `"`, and `'` to eliminate email client injection vectors.
+- **HTTP Methods**: Only `GET`, `HEAD`, and `OPTIONS` are supported; everything else returns `405 Method Not Allowed`.
+
+---
+
+## ⚙️ Cloudflare Bindings (Optional)
+
+SignaaS works out of the box with zero configuration. For production scale, you can optionally enable KV and D1 bindings:
+
+- **Rate Limiting (KV)**: Bound as `RATE_LIMIT_KV` in `wrangler.jsonc` to enforce free-tier hourly limits (100 req/hr/IP). API keys set via `API_KEYS` secret bypass this.
+  ```bash
+  npx wrangler kv namespace create RATE_LIMIT_KV
+  ```
+- **Live Counter (D1)**: Bound as `DB` in `wrangler.jsonc` to track total signatures served on the homepage and `/health`.
+  ```bash
+  npx wrangler d1 create signaas
+  ```
+
+---
+
+## 🚢 Deployment
+
+Deploy to your own Cloudflare Workers domain in seconds:
+
+```bash
+npm run deploy
+```
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.

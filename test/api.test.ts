@@ -148,21 +148,42 @@ describe("service endpoints", () => {
   it("carries the design system the homepage is built on", async () => {
     const response = await get("/", { headers: { accept: "text/html" } });
     const body = await response.text();
-    // Two typefaces, one accent, square corners: the homepage's whole visual argument.
-    expect(body).toContain("Space Grotesk");
-    expect(body).toContain("JetBrains Mono");
-    expect(body).toContain("--accent: #ff4a00");
-    const radii = body.match(/border-radius:[^;]*/g) ?? [];
-    expect(radii.filter((rule) => !/:\s*0$/.test(rule))).toEqual([]);
-    expect(body).not.toContain("box-shadow");
+    // Two typefaces, one muted accent, and none of the generated-template tells.
+    expect(body).toContain("DM Sans");
+    expect(body).toContain("Fira Code");
+    expect(body).toContain("--accent: #9d5b3f");
     expect(body).not.toContain("linear-gradient");
   });
 
-  it("writes empty and failure states with a voice", async () => {
+  it("softens its geometry without floating", async () => {
     const response = await get("/", { headers: { accept: "text/html" } });
     const body = await response.text();
-    expect(body).toContain("It's awfully quiet in here.");
-    expect(body).toContain("never came back");
+    const lengths = (rules: RegExpMatchArray | null) =>
+      (rules ?? []).flatMap((rule) => rule.match(/\d+(?=px)/g) ?? []).map(Number);
+
+    // Just the sharp edge taken off: 6px, never a pill or a rounded card.
+    expect(lengths(body.match(/border-radius:[^;]*/g)).filter((value) => value > 6)).toEqual([]);
+
+    // Depth only ever separates layers, so every shadow stays nearly invisible.
+    const opacities = (body.match(/(?:--|box-)shadow:[^;]*/g) ?? [])
+      .flatMap((rule) => rule.match(/0\.\d+(?=\))/g) ?? [])
+      .map(Number);
+    expect(opacities.length).toBeGreaterThan(0);
+    expect(Math.max(...opacities)).toBeLessThanOrEqual(0.25);
+  });
+
+  it("moves gently rather than snapping", async () => {
+    const response = await get("/", { headers: { accept: "text/html" } });
+    const body = await response.text();
+    expect(body).toContain("--ease: 150ms ease-in-out");
+    expect(body).not.toContain("transition: none");
+  });
+
+  it("keeps its empty and failure states conversational", async () => {
+    const response = await get("/", { headers: { accept: "text/html" } });
+    const body = await response.text();
+    expect(body).toContain("It's a little quiet in here right now.");
+    expect(body).toContain("give it another go");
   });
 
   it("serves a JSON index to API clients", async () => {

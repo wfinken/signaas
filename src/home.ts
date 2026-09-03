@@ -1,6 +1,6 @@
 import { CATEGORIES } from "./categories";
 import { REPOSITORY_URL } from "./config";
-import { buildSignature, toText } from "./signature";
+import { buildSignature, toHtml, toText } from "./signature";
 
 /** Safe to embed inside a <script> tag: no closing tag can escape the string. */
 function jsonForScript(value: unknown): string {
@@ -198,32 +198,169 @@ section {
 .lede { color: var(--ink-soft); margin-top: 18px; max-width: 66ch; }
 
 /* ------------------------------------------------------------------- hero */
-.hero { padding-top: 96px; padding-bottom: 88px; }
-.hero h1 { max-width: 18ch; }
-.hero .lede { font-size: 18px; color: var(--ink-soft); margin-top: 24px; }
+.hero { padding-top: 64px; padding-bottom: 88px; }
+.hero-top { margin-bottom: 24px; }
 .served {
-  margin-top: 22px; display: inline-flex; align-items: center; gap: 9px;
+  display: inline-flex; align-items: center; gap: 9px;
   font-size: 14px; color: var(--sage); background: var(--sage-soft);
   padding: 6px 13px 6px 11px; border-radius: var(--radius);
 }
 .served b { font-weight: 600; font-variant-numeric: tabular-nums; }
-.hero .curl {
-  margin-top: 36px; background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px;
+
+/* ----------------------------------------------------------- email client UI */
+.email-client {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.email-header {
+  background: var(--sunk);
+  border-bottom: 1px solid var(--line-soft);
+}
+.email-window-bar {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line-soft);
+  position: relative;
+}
+.window-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dot-btn {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: block;
+}
+.dot-btn.red { background: #ff5f56; border: 1px solid #e0443e; }
+.dot-btn.yellow { background: #ffbd2e; border: 1px solid #dea123; }
+.dot-btn.green { background: #27c93f; border: 1px solid #1aab29; }
+.email-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.email-fields {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.email-field {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 14px;
+}
+.email-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  width: 65px;
+  flex-shrink: 0;
+}
+.email-value {
+  color: var(--ink-soft);
+}
+.email-value strong {
+  color: var(--ink);
+}
+.email-subject {
+  font-weight: 600;
+  color: var(--ink);
+}
+.email-body {
+  padding: 40px 48px;
+}
+.email-tag {
+  margin-bottom: 16px;
+}
+.hero h1 { max-width: 22ch; }
+.hero .lede { font-size: 18px; color: var(--ink-soft); margin-top: 16px; }
+.hero-curl {
+  margin-top: 32px; background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 16px 20px;
   display: flex; gap: 14px; align-items: baseline; overflow-x: auto; white-space: nowrap;
   font-size: 14px;
 }
-.hero .curl span { color: var(--accent); }
+.hero-curl span { color: var(--accent); }
 .facts {
-  margin-top: 36px;
+  margin-top: 32px;
   display: grid; grid-template-columns: repeat(4, 1fr);
-  background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden;
 }
-.facts div { padding: 22px 26px; border-left: 1px solid var(--line-soft); }
+.facts div { padding: 20px 24px; border-left: 1px solid var(--line-soft); }
 .facts div:first-child { border-left: 0; }
-.facts b { display: block; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; }
+.facts b { display: block; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
 .facts .label { display: block; margin-top: 4px; }
+.email-signature-block {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--line);
+}
+.sig-divider {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.sig-content {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+  padding: 16px 20px;
+  background: var(--sunk);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.sig-content p { margin: 0 0 4px; }
+.sig-content p:last-child { margin-bottom: 0; }
+.sig-footer {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.sig-meta-text {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.sig-meta-text code {
+  color: var(--accent);
+  font-weight: 500;
+}
+.sig-shuffle-btn {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+}
+.sig-shuffle-btn:hover {
+  background: var(--sunk);
+  color: var(--ink);
+  border-color: var(--accent-line);
+}
 
 /* ---------------------------------------------------------------- console */
 .console {
@@ -432,6 +569,9 @@ footer {
 @media (max-width: 620px) {
   /* Stranded on its own line, the primary action may as well span it. */
   .btn.go { margin-left: 0; flex: 1 1 100%; }
+  .email-body { padding: 24px 20px; }
+  .email-fields { padding: 14px 16px; }
+  .email-title { display: none; }
 }
 @media (max-width: 520px) {
   .fields { grid-template-columns: 1fr; }
@@ -649,6 +789,24 @@ const SCRIPT = `
   window.addEventListener("resize", mark);
   mark();
 
+  var sigContainer = document.getElementById("hero-sig-rendered");
+  var sigMeta = document.getElementById("hero-sig-meta");
+  var sigShuffle = document.getElementById("hero-sig-shuffle");
+  if (sigShuffle && sigContainer && sigMeta) {
+    sigShuffle.addEventListener("click", function () {
+      var cat = categories[Math.floor(Math.random() * categories.length)];
+      if (!cat) return;
+      var url = "/" + encodeURIComponent(cat.slug) + "/Ada?title=VP%20of%20Sign-offs&company=Signaas&format=html";
+      fetch(url, { headers: { accept: "text/html" } })
+        .then(function (res) { return res.text(); })
+        .then(function (html) {
+          sigContainer.innerHTML = html;
+          sigMeta.innerHTML = "Random tone: <code>" + cat.slug + "</code> (" + cat.name + ")";
+        })
+        .catch(function () { /* ignore error */ });
+    });
+  }
+
   say(out, "It's a little quiet in here right now. Let's get your first request set up.");
   render();
 })();
@@ -721,20 +879,34 @@ function servedLine(served: number | null): string {
   return `<p class="served"><span class="dot"></span><b id="served">${count}</b> signatures served</p>`;
 }
 
+function renderRandomSignatureBlock(): { html: string; categoryName: string; categorySlug: string } {
+  const category = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)]!;
+  const signature = buildSignature(
+    category,
+    { name: "Ada", title: "VP of Sign-offs", company: "Signaas" },
+  );
+  return {
+    html: toHtml(signature),
+    categoryName: category.name,
+    categorySlug: category.slug,
+  };
+}
+
 export function renderHomepage(
   origin: string,
   canonical: string,
   served: number | null = null,
 ): string {
   const host = canonical.replace(/^https?:\/\//, "");
+  const randomSig = renderRandomSignatureBlock();
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>SignaaS — Signature as a Service</title>
+<title>Signaas — Signature as a Service</title>
 <meta name="description" content="A tiny REST API that returns stylized email sign-offs in JSON, plain text or HTML. Dozens of tones, one URL."/>
-<meta property="og:title" content="SignaaS — Signature as a Service"/>
+<meta property="og:title" content="Signaas — Signature as a Service"/>
 <meta property="og:description" content="GET /passive-aggressive/Alice. Stylized sign-offs as a service."/>
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="${canonical}/"/>
@@ -778,20 +950,67 @@ export function renderHomepage(
 
   <main id="main">
     <section class="hero">
-      <div class="label">Signature as a Service</div>
-      <h1>Sign off with exactly the energy the moment deserves.</h1>
-      <p class="lede">
-        One GET request returns a stylized sign-off as JSON, plain text or HTML.
-        ${CATEGORY_SUMMARY.length} tones, from Business to Existential Dread. No key, no
-        signup, no state to keep warm.
-      </p>
-      ${servedLine(served)}
-      <div class="curl mono"><span>$</span>curl ${origin}/passive-aggressive/Alice</div>
-      <div class="facts">
-        <div><b>${CATEGORY_SUMMARY.length}</b><span class="label">Tones</span></div>
-        <div><b>${TEMPLATE_COUNT}</b><span class="label">Templates</span></div>
-        <div><b>3</b><span class="label">Formats</span></div>
-        <div><b>0</b><span class="label">Signup steps</span></div>
+      <div class="hero-top">
+        ${servedLine(served)}
+      </div>
+
+      <div class="email-client">
+        <div class="email-header">
+          <div class="email-window-bar">
+            <div class="window-dots">
+              <span class="dot-btn red"></span>
+              <span class="dot-btn yellow"></span>
+              <span class="dot-btn green"></span>
+            </div>
+            <div class="email-title">Inbox — Signaas</div>
+          </div>
+          <div class="email-fields">
+            <div class="email-field">
+              <span class="email-label">From:</span>
+              <span class="email-value"><strong>Signaas</strong> &lt;hello@signa.as&gt;</span>
+            </div>
+            <div class="email-field">
+              <span class="email-label">To:</span>
+              <span class="email-value"><strong>You</strong> &lt;developer@localhost&gt;</span>
+            </div>
+            <div class="email-field">
+              <span class="email-label">Subject:</span>
+              <span class="email-value email-subject">Sign off with exactly the energy the moment deserves.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="email-body">
+          <div class="email-tag">
+            <span class="label">Signature as a Service</span>
+          </div>
+          <h1>Sign off with exactly the energy the moment deserves.</h1>
+          <p class="lede">
+            One GET request returns a stylized sign-off as JSON, plain text or HTML.
+            ${CATEGORY_SUMMARY.length} tones, from Business to Existential Dread. No key, no
+            signup, no state to keep warm.
+          </p>
+
+          <div class="hero-curl mono"><span>$</span>curl ${origin}/passive-aggressive/Alice</div>
+
+          <div class="facts">
+            <div><b>${CATEGORY_SUMMARY.length}</b><span class="label">Tones</span></div>
+            <div><b>${TEMPLATE_COUNT}</b><span class="label">Templates</span></div>
+            <div><b>3</b><span class="label">Formats</span></div>
+            <div><b>0</b><span class="label">Signup steps</span></div>
+          </div>
+
+          <div class="email-signature-block">
+            <div class="sig-divider">--</div>
+            <div class="sig-content" id="hero-sig-rendered">
+              ${randomSig.html}
+            </div>
+            <div class="sig-footer">
+              <span class="sig-meta-text" id="hero-sig-meta">Random tone: <code>${randomSig.categorySlug}</code> (${randomSig.categoryName})</span>
+              <button type="button" class="sig-shuffle-btn" id="hero-sig-shuffle">Randomize sign-off</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

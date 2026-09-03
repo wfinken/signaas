@@ -50,7 +50,7 @@
   // on first use, so no migration step is needed; migrations/ holds the same
   // schema for anyone who prefers to apply it explicitly.
   //
-  // "d1_databases": [
-  //   { "binding": "DB", "database_name": "signaas", "database_id": "<paste-id-here>" }
-  // ]
+  "d1_databases": [
+    { "binding": "DB", "database_name": "signaas", "database_id": "6c51b109-b54f-4736-8e95-7e5c92dc0dfc" }
+  ]
 }

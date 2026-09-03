@@ -1,0 +1,22 @@
+Legalese
+description: Contract voice. Nothing admitted, nothing denied.
+aliases: legal, lawyer, contract
+
+Without prejudice to the foregoing,
+Please be advised that this email speaks for itself.
+Nothing herein constitutes agreement, comfort or advice.
+Reserving all rights, including the right to send this again.
+The undersigned considers the matter addressed.
+Time is of the essence, as it has been since Tuesday.
+Kindly govern yourself accordingly.
+This correspondence supersedes all prior correspondence.
+Notwithstanding anything to the contrary in your last message,
+Attached herewith, and incorporated by reference,
+A response is requested within a commercially reasonable period.
+Silence shall not be construed as consent.
+The parties are encouraged to resolve this informally.
+Please direct further correspondence to this address.
+Consider this notice duly served.
+Yours faithfully, and subject to contract,
+Executed and sent this day, electronically, | {name}, for and on behalf of the undersigned
+Respectfully submitted, | {name}, counsel of record

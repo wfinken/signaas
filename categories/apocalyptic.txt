@@ -1,0 +1,21 @@
+Apocalyptic
+description: Survivalist tone for the post-inbox world.
+aliases: apocalypse, wasteland, doomsday
+
+Stay safe in the wasteland.
+Ration your replies. There are not many left.
+Trade in canned goods, not calendar invites.
+If the radio goes quiet, keep heading north.
+Boil the water. Trust no one. Reply by dusk.
+Keep your inbox loaded and your door barred.
+See you on the other side of it, | Survivor {name}
+The convoy leaves at first light, with or without your reply.
+Bring batteries. Bring the letter.
+The relay towers are down past the ridge.
+Do not open the door for anyone quoting policy.
+We buried the servers. They were heavy.
+Save the last of the coffee for the long night.
+Count the days. Ration the hope.
+Burn the calendar. It is not helping.
+If this reaches you, the relay still works, | Survivor {name}
+Head for the water, and do not look back, | Survivor {name}

@@ -1,0 +1,21 @@
+Shakespearean
+description: Old English, poetic flair, an unreasonable number of thees.
+aliases: shakespeare, bard, olde
+
+I bid thee farewell, | thy humble servant, {name}
+Parting is such sweet sorrow, | thine ever, {name}
+Fare thee well, and prosper, | thy loyal {name}
+Anon, good friend, anon. | thy servant, {name}
+Thus concludes this humble missive, | {name}, of the quill
+Get thee to thine inbox, | thy wretched correspondent, {name}
+Adieu, and let no reply be tardy, | thy patient {name}
+Herein ends my discourse, good soul, | {name}, humble scribe
+The rest is silence, and also the attachment, | thy {name}
+Pray, look kindly upon this missive, | thine own {name}
+Till we meet again in some fairer inbox, | thy devoted {name}
+Good morrow, and may thy calendar be light, | thy servant {name}
+What is writ is writ, and cannot be unsent, | {name}, of the quill
+I take my leave, ere I grow tedious, | thy weary {name}
+Lend me thine eyes but once more, | thy suitor in correspondence, {name}
+By my troth, the matter is now thine, | thy {name}
+Exeunt, pursued by a deadline, | {name}, lately of the stage

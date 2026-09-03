@@ -152,6 +152,17 @@ describe("service endpoints", () => {
     expect(body).toContain("give it another go");
   });
 
+  it("invites readers to add to the corpus on GitHub", async () => {
+    const response = await get("/", { headers: { accept: "text/html" } });
+    const body = await response.text();
+    expect(body).toContain('id="contribute"');
+    expect(body).toContain('href="https://github.com/wfinken/signaas"');
+    expect(body).toContain("https://github.com/wfinken/signaas/blob/main/CONTRIBUTING.md");
+    // The sample file on the page is built from the corpus, in the real format.
+    expect(body).toContain("Pirate\ndescription: Swashbuckling sign-offs for the seven seas.");
+    expect(body).toContain("signer: Cap'n {name}");
+  });
+
   it("serves a JSON index to API clients", async () => {
     const response = await get("/", { headers: { accept: "application/json" } });
     const body = (await response.json()) as { categories: string[] };

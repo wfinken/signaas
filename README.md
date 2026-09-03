@@ -203,6 +203,7 @@ to a Cloudflare Workers Build deploys every push to `main` automatically:
 - Build command: `npm install` (the Worker is TypeScript, bundled at deploy time;
   the install also builds the corpus out of `categories/*.txt`)
 - Deploy command: `npm run deploy`
+- Node.js version: Specified via `.nvmrc` and `.node-version` (Node 20) for fast build environment initialization.
 
 Manual deploys use the same command:
 

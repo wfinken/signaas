@@ -1,0 +1,22 @@
+Academic
+description: Peer-reviewed sign-offs with a footnote's worth of hedging.
+aliases: scholar, peer-review, thesis
+
+Further work is required, as ever.
+This finding is preliminary and should be treated as such.
+I defer to the literature, and to you.
+Happy to discuss at greater length than anyone wants.
+The limitations of this email are discussed below.
+With apologies for the length and for the citations,
+The data are, at best, suggestive.
+I look forward to your comments, however brutal.
+Reviewer 2 would have hated this email.
+More study is needed. There always is.
+The argument holds, provided you accept the premise.
+As I argued at length elsewhere,
+This remains an open question,
+Corrections gratefully received,
+Pending revisions,
+In collegial regard,
+Submitted for your consideration, | {name}
+With scholarly regards, | {name}

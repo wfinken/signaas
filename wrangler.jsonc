@@ -1,0 +1,56 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "signaas",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-02-04",
+  "observability": {
+    "enabled": true
+  },
+
+  // The production domain. Both entries require signaas.cc to be an active
+  // zone on this Cloudflare account; wrangler then creates the DNS records
+  // itself. If a deploy fails with "could not find zone", add the domain
+  // under Websites in the dashboard (or move its nameservers to Cloudflare)
+  // and redeploy.
+  "routes": [
+    { "pattern": "signaas.cc", "custom_domain": true },
+    { "pattern": "www.signaas.cc", "custom_domain": true }
+  ],
+
+  "vars": {
+    // Free-tier allowance, per IP, per rolling hour window.
+    "RATE_LIMIT": "100",
+    // Canonical origin, used for <link rel=canonical> and OpenAPI servers.
+    "PUBLIC_ORIGIN": "https://signaas.cc"
+  },
+
+  // Rate limiting is enabled automatically once a KV namespace is bound as
+  // RATE_LIMIT_KV. Without the binding the API still serves every request,
+  // it just does not count them. To enable:
+  //
+  //   npx wrangler kv namespace create RATE_LIMIT_KV
+  //
+  // then uncomment and paste the returned id:
+  //
+  // "kv_namespaces": [
+  //   { "binding": "RATE_LIMIT_KV", "id": "<paste-id-here>" }
+  // ]
+  //
+  // Paid-tier keys bypass the limit. Set them as a secret (comma separated):
+  //
+  //   npx wrangler secret put API_KEYS
+
+  // The "signatures served" tally on the homepage is backed by D1, and is off
+  // until a database is bound as DB. Without it the API serves every request
+  // and the homepage simply leaves the line out. To enable:
+  //
+  //   npx wrangler d1 create signaas
+  //
+  // then uncomment and paste the returned id. The counters table is created
+  // on first use, so no migration step is needed; migrations/ holds the same
+  // schema for anyone who prefers to apply it explicitly.
+  //
+  "d1_databases": [
+    { "binding": "DB", "database_name": "signaas", "database_id": "6c51b109-b54f-4736-8e95-7e5c92dc0dfc" }
+  ]
+}

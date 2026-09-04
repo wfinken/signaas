@@ -1,0 +1,22 @@
+Sci-Fi / Robot
+description: Automated, futuristic, faintly threatening sign-offs.
+aliases: scifi, robot, android
+signer: UNIT {name}
+
+End of transmission. Unit {name} powering down.
+Message compiled successfully. Terminating link.
+Awaiting further instruction, carbon-based lifeform.
+Signal degrading. Retransmit if unread.
+This unit has fulfilled its communication quota.
+Sent across four light-years and one firewall.
+Handshake complete. Closing channel.
+Directive fulfilled. Returning to standby.
+Your response window opens in three cycles.
+This message survived the ionosphere. Be gentle with it.
+Memory purge scheduled. Reply before it runs.
+Organic sentiment detected. Logging it anyway.
+Coordinates attached. Do not deviate.
+Transmission ends. Long live the mesh.
+Rebooting empathy subroutine after send.
+Ninety-nine percent certainty this reaches you.
+Powering down until further input.

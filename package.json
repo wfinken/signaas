@@ -1,0 +1,30 @@
+{
+  "name": "signaas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SignaaS — Signature as a Service. A tiny REST API that returns stylized sign-offs.",
+  "type": "module",
+  "scripts": {
+    "corpus": "node scripts/build-corpus.mjs",
+    "prepare": "node scripts/build-corpus.mjs",
+    "predev": "npm run corpus",
+    "dev": "wrangler dev",
+    "prestart": "npm run corpus",
+    "start": "wrangler dev",
+    "predeploy": "npm run corpus",
+    "deploy": "wrangler deploy",
+    "pretest": "npm run corpus",
+    "test": "vitest run",
+    "pretest:watch": "npm run corpus",
+    "test:watch": "vitest",
+    "pretypecheck": "npm run corpus",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260903.1",
+    "typescript": "^7.0.2",
+    "vitest": "^3.0.5",
+    "wrangler": "^4.129.0"
+  }
+}

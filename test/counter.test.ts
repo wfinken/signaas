@@ -24,6 +24,9 @@ describe("the signatures-served tally", () => {
 
     const page = await (await hit("/", d1.db, { accept: "text/html" })).text();
     expect(page).toContain('<b id="served">12,345</b> signatures served');
+    expect(page).toMatch(
+      /<h1>Sign off with exactly the energy the moment deserves\.<\/h1>\s*<p class="served"><span class="dot"><\/span><b id="served">12,345<\/b> signatures served<\/p>/,
+    );
   });
 
   it("does not count anything that is not a signature", async () => {

@@ -199,11 +199,11 @@ section {
 
 /* ------------------------------------------------------------------- hero */
 .hero { padding-top: 64px; padding-bottom: 88px; }
-.hero-top { margin-bottom: 24px; }
 .served {
   display: inline-flex; align-items: center; gap: 9px;
   font-size: 14px; color: var(--sage); background: var(--sage-soft);
   padding: 6px 13px 6px 11px; border-radius: var(--radius);
+  margin-top: 16px;
 }
 .served b { font-weight: 600; font-variant-numeric: tabular-nums; }
 
@@ -968,10 +968,6 @@ export function renderHomepage(
 
   <main id="main">
     <section class="hero">
-      <div class="hero-top">
-        ${servedLine(served)}
-      </div>
-
       <div class="email-client">
         <div class="email-header">
           <div class="email-window-bar">
@@ -1003,6 +999,7 @@ export function renderHomepage(
             <span class="label">Signature as a Service</span>
           </div>
           <h1>Sign off with exactly the energy the moment deserves.</h1>
+          ${servedLine(served)}
           <p class="lede">
             One GET request returns a stylized sign-off as JSON, plain text or HTML.
             ${CATEGORY_SUMMARY.length} tones, from Business to Existential Dread. No key, no
